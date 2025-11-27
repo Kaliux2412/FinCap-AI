@@ -1,0 +1,5 @@
+{
+  "name": "FinCap AI",
+  "description": "An intelligent financial assistant for startups that analyzes real-time database metrics to provide strategic advice using Gemini.",
+  "requestFramePermissions": []
+}

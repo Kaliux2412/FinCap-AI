@@ -1,0 +1,51 @@
+
+export const initialData = {
+  users: [
+    {
+      id: "user_1",
+      displayName: "Alex Tech",
+      email: "alex@startup.com",
+      password: "password123",
+      createdAt: "2025-01-01T00:00:00Z",
+      photoUrl: "",
+      companyName: "TechFlow Inc."
+    },
+    {
+      id: "user_2",
+      displayName: "Sarah Design",
+      email: "sarah@studio.com",
+      password: "designpass",
+      createdAt: "2025-03-10T00:00:00Z",
+      photoUrl: "",
+      companyName: "Pixel Perfect"
+    },
+    {
+      id: "user_3",
+      displayName: "Mike Consultant",
+      email: "mike@advice.com",
+      password: "consultant",
+      createdAt: "2025-05-20T00:00:00Z",
+      photoUrl: "",
+      companyName: "GrowFast Agency"
+    }
+  ],
+  accounts: [
+    { id: "acc_1", userId: "user_1", name: "Mercury Checking", type: "checking", balance: 15000 },
+    { id: "acc_2", userId: "user_1", name: "Brex Credit", type: "credit", balance: -2000 },
+    { id: "acc_3", userId: "user_2", name: "Chase Business", type: "checking", balance: 8500 },
+    { id: "acc_4", userId: "user_3", name: "Wells Fargo", type: "checking", balance: 45000 }
+  ],
+  transactions: [
+    { id: "tx_1", userId: "user_1", description: "SaaS Subscription Revenue", amount: 12000, type: "income", date: "2025-11-01", category: "Sales" },
+    { id: "tx_2", userId: "user_1", description: "AWS Server Cost", amount: 1500, type: "expense", date: "2025-11-05", category: "Software" },
+    { id: "tx_3", userId: "user_1", description: "WeWork Office", amount: 2000, type: "expense", date: "2025-11-02", category: "Rent" },
+    { id: "tx_4", userId: "user_1", description: "Client Project A", amount: 5000, type: "income", date: "2025-10-15", category: "Sales" },
+    { id: "tx_5", userId: "user_1", description: "Payroll Oct", amount: 8000, type: "expense", date: "2025-10-30", category: "Payroll" },
+    
+    { id: "tx_6", userId: "user_2", description: "Logo Design Project", amount: 3000, type: "income", date: "2025-11-10", category: "Services" },
+    { id: "tx_7", userId: "user_2", description: "Adobe CC", amount: 60, type: "expense", date: "2025-11-01", category: "Software" },
+
+    { id: "tx_8", userId: "user_3", description: "Retainer Fee", amount: 10000, type: "income", date: "2025-11-01", category: "Consulting" },
+    { id: "tx_9", userId: "user_3", description: "Travel Expenses", amount: 1200, type: "expense", date: "2025-11-12", category: "Travel" }
+  ]
+};
