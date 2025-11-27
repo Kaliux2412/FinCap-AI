@@ -146,4 +146,3 @@ See the `LICENSE` file for more details.
 ## 💡 Credits
 
 Developed by Kevin, Karla, Timoteo and Gaby as part of a finance-focused AI project presented to Google and BBVA in Agaveth0n GDL 2025.  
->>>>>>> 6082ac01903d236bbaa3d4cd214812317561dfd7
