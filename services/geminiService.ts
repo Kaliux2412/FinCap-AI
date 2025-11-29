@@ -2,6 +2,7 @@
 import { GoogleGenAI, Type, FunctionDeclaration, Tool } from "@google/genai";
 import { FinancialContext, Language, Transaction } from "../types";
 import { formatCurrency, addTransaction } from "./mockFirebaseService";
+import { geminiRateLimiter } from "./rateLimiter";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const MODEL_NAME = "gemini-2.5-flash";
@@ -92,6 +93,18 @@ export const sendMessageToGemini = async (
   lang: Language
 ): Promise<{ text: string; dataChanged: boolean }> => {
   try {
+    // Check rate limit before making API call
+    const rateLimitCheck = await geminiRateLimiter.tryConsume();
+    if (!rateLimitCheck.allowed) {
+      const waitSeconds = Math.ceil(rateLimitCheck.waitMs! / 1000);
+      return {
+        text: lang === 'es'
+          ? `Límite de solicitudes alcanzado. Por favor espera ${waitSeconds} segundos antes de intentar nuevamente.`
+          : `Rate limit reached. Please wait ${waitSeconds} seconds before trying again.`,
+        dataChanged: false
+      };
+    }
+
     const systemInstruction = createSystemInstruction(financialContext, lang);
     let dataChanged = false;
 
@@ -173,6 +186,14 @@ export const analyzeFinancialDocument = async (
   mimeType: string
 ): Promise<Partial<Transaction>[]> => {
   try {
+    // Check rate limit before making API call
+    const rateLimitCheck = await geminiRateLimiter.tryConsume();
+    if (!rateLimitCheck.allowed) {
+      const waitSeconds = Math.ceil(rateLimitCheck.waitMs! / 1000);
+      console.warn(`Rate limit reached. Wait ${waitSeconds}s before analyzing documents.`);
+      throw new Error(`RATE_LIMIT: Please wait ${waitSeconds} seconds before uploading another document.`);
+    }
+
     const prompt = `
       Analyze this financial document (bank statement, invoice, or receipt).
       Extract all individual transactions found.

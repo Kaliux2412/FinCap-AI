@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [financialContext, setFinancialContext] = useState<FinancialContext | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState<View>('dashboard');
-  const [lang, setLang] = useState<Language>('es');
+  const [lang, setLang] = useState<Language>('en');
   const [theme, setTheme] = useState<Theme>('dark');
   
   const t = (key: any) => getTranslation(lang, key);

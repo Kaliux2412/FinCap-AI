@@ -14,9 +14,9 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Form State
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // Form State - Autofilled with demo credentials
+  const [email, setEmail] = useState('alex@startup.com');
+  const [password, setPassword] = useState('password123');
   const [name, setName] = useState('');
   const [company, setCompany] = useState('');
 
@@ -178,14 +178,27 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
             </button>
           </div>
 
-          {/* Demo Hints */}
+          {/* Demo Credentials */}
           {isLogin && (
              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-               <p className="text-xs text-slate-400 mb-2 text-center uppercase tracking-wider">Try Demo Users</p>
-               <div className="flex gap-2 justify-center flex-wrap">
-                 <button onClick={() => handleDemoLogin('alex@startup.com')} className="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">Startup</button>
-                 <button onClick={() => handleDemoLogin('sarah@studio.com')} className="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">Freelancer</button>
-                 <button onClick={() => handleDemoLogin('mike@advice.com')} className="text-xs bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">Agency</button>
+               <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                   Demo Credentials (Auto-filled)
+                 </p>
+                 <div className="space-y-2 text-sm">
+                   <div className="flex items-center justify-between bg-white dark:bg-slate-800 px-3 py-2 rounded border border-slate-200 dark:border-slate-700">
+                     <span className="text-slate-500 dark:text-slate-400 font-medium">Email:</span>
+                     <code className="text-blue-600 dark:text-blue-400 font-mono text-xs">alex@startup.com</code>
+                   </div>
+                   <div className="flex items-center justify-between bg-white dark:bg-slate-800 px-3 py-2 rounded border border-slate-200 dark:border-slate-700">
+                     <span className="text-slate-500 dark:text-slate-400 font-medium">Password:</span>
+                     <code className="text-blue-600 dark:text-blue-400 font-mono text-xs">password123</code>
+                   </div>
+                 </div>
+                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-3 italic">
+                   This is a demo application. Click "Sign In" to access the dashboard.
+                 </p>
                </div>
              </div>
           )}
