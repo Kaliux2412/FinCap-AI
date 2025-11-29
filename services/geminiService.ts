@@ -93,6 +93,9 @@ export const sendMessageToGemini = async (
   lang: Language
 ): Promise<{ text: string; dataChanged: boolean }> => {
   try {
+    // If running on Netlify (production), proxy through serverless function to keep API key private
+    const useNetlifyFunction = (import.meta as any)?.env?.VITE_USE_NETLIFY_FN === 'true'
+      || (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app'));
     // Check rate limit before making API call
     const rateLimitCheck = await geminiRateLimiter.tryConsume();
     if (!rateLimitCheck.allowed) {
@@ -109,15 +112,33 @@ export const sendMessageToGemini = async (
     let dataChanged = false;
 
     // 1. First call to model (checking if tool is needed)
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: message,
-      config: {
-        systemInstruction: systemInstruction,
-        temperature: 0.7,
-        tools: tools,
-      },
-    });
+    const response = useNetlifyFunction
+      ? await (async () => {
+          const res = await fetch('/.netlify/functions/ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: MODEL_NAME,
+              contents: message,
+              config: {
+                systemInstruction,
+                temperature: 0.7,
+                tools,
+              }
+            })
+          });
+          const json = await res.json();
+          return json;
+        })()
+      : await ai.models.generateContent({
+          model: MODEL_NAME,
+          contents: message,
+          config: {
+            systemInstruction: systemInstruction,
+            temperature: 0.7,
+            tools: tools,
+          },
+        });
 
     // 2. Check for function calls
     const functionCalls = response.functionCalls;
@@ -152,23 +173,41 @@ export const sendMessageToGemini = async (
           }
         };
 
-        const finalResponse = await ai.models.generateContent({
-          model: MODEL_NAME,
-          contents: [
-            { role: 'user', parts: [{ text: message }] },
-            response.candidates![0].content, // The model's decision to call function
-            { role: 'tool', parts: [resultPart] } // The function result
-          ],
-          config: {
-             systemInstruction: systemInstruction 
-          }
-        });
+        const finalResponse = useNetlifyFunction
+          ? await (async () => {
+              const res = await fetch('/.netlify/functions/ai', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: MODEL_NAME,
+                  contents: [
+                    { role: 'user', parts: [{ text: message }] },
+                    response.candidates![0].content,
+                    { role: 'tool', parts: [resultPart] }
+                  ],
+                  config: { systemInstruction }
+                })
+              });
+              const json = await res.json();
+              return json;
+            })()
+          : await ai.models.generateContent({
+              model: MODEL_NAME,
+              contents: [
+                { role: 'user', parts: [{ text: message }] },
+                response.candidates![0].content, // The model's decision to call function
+                { role: 'tool', parts: [resultPart] } // The function result
+              ],
+              config: {
+                 systemInstruction: systemInstruction 
+              }
+            });
 
         return { text: finalResponse.text || "Transaction created.", dataChanged };
       }
     }
 
-    return { text: response.text || "No response.", dataChanged };
+    return { text: response.text || response?.text || "No response.", dataChanged };
 
   } catch (error) {
     console.error("Gemini API Error:", error);
@@ -186,6 +225,8 @@ export const analyzeFinancialDocument = async (
   mimeType: string
 ): Promise<Partial<Transaction>[]> => {
   try {
+    const useNetlifyFunction = (import.meta as any)?.env?.VITE_USE_NETLIFY_FN === 'true'
+      || (typeof window !== 'undefined' && window.location.hostname.includes('netlify.app'));
     // Check rate limit before making API call
     const rateLimitCheck = await geminiRateLimiter.tryConsume();
     if (!rateLimitCheck.allowed) {
@@ -206,37 +247,77 @@ export const analyzeFinancialDocument = async (
       5. Assign a short, clear Category Name.
     `;
 
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: {
-        parts: [
-          { inlineData: { mimeType: mimeType, data: base64Data } },
-          { text: prompt }
-        ]
-      },
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            transactions: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  date: { type: Type.STRING, description: "YYYY-MM-DD" },
-                  description: { type: Type.STRING },
-                  amount: { type: Type.NUMBER },
-                  type: { type: Type.STRING, description: "income or expense" },
-                  category: { type: Type.STRING }
-                },
-                required: ["date", "description", "amount", "type", "category"]
+    const response = useNetlifyFunction
+      ? await (async () => {
+          const res = await fetch('/.netlify/functions/ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: MODEL_NAME,
+              contents: {
+                parts: [
+                  { inlineData: { mimeType: mimeType, data: base64Data } },
+                  { text: prompt }
+                ]
+              },
+              config: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: Type.OBJECT,
+                  properties: {
+                    transactions: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          date: { type: Type.STRING, description: "YYYY-MM-DD" },
+                          description: { type: Type.STRING },
+                          amount: { type: Type.NUMBER },
+                          type: { type: Type.STRING, description: "income or expense" },
+                          category: { type: Type.STRING }
+                        },
+                        required: ["date", "description", "amount", "type", "category"]
+                      }
+                    }
+                  }
+                }
+              }
+            })
+          });
+          const json = await res.json();
+          return json;
+        })()
+      : await ai.models.generateContent({
+          model: MODEL_NAME,
+          contents: {
+            parts: [
+              { inlineData: { mimeType: mimeType, data: base64Data } },
+              { text: prompt }
+            ]
+          },
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                transactions: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      date: { type: Type.STRING, description: "YYYY-MM-DD" },
+                      description: { type: Type.STRING },
+                      amount: { type: Type.NUMBER },
+                      type: { type: Type.STRING, description: "income or expense" },
+                      category: { type: Type.STRING }
+                    },
+                    required: ["date", "description", "amount", "type", "category"]
+                  }
+                }
               }
             }
           }
-        }
-      }
-    });
+        });
 
     const text = response.text;
     if (!text) return [];
