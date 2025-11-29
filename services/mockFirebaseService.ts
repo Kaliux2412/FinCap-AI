@@ -138,6 +138,17 @@ export const logoutUser = () => {
 
 export const getCurrentUser = () => currentUser;
 
+// --- DATA RESET SERVICE ---
+export const clearUserData = (): void => {
+  if (!currentUser) return;
+  const userId = currentUser.id;
+  // Remove all user-specific data from in-memory storage
+  transactions = transactions.filter(t => t.user.id !== userId);
+  categories = categories.filter(c => c.user.id !== userId);
+  messages = messages.filter(m => m.user.id !== userId);
+  accounts = accounts.filter(a => a.user.id !== userId);
+};
+
 // --- DATA SERVICE ---
 
 export const getChatHistory = (): Message[] => {

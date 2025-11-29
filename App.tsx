@@ -8,7 +8,7 @@ import DocumentUpload from './components/DocumentUpload';
 import CalendarView from './components/CalendarView';
 import LoadingOverlay from './components/LoadingOverlay';
 import AuthScreen from './components/AuthScreen';
-import { fetchFinancialContext, getCurrentUser, logoutUser } from './services/mockFirebaseService';
+import { fetchFinancialContext, getCurrentUser, logoutUser, clearUserData } from './services/mockFirebaseService';
 import { FinancialContext, Language, User } from './types';
 import { getTranslation } from './translations';
 import { 
@@ -198,7 +198,18 @@ const App: React.FC = () => {
           {/* Views */}
           {activeView === 'dashboard' && (
             <div className="h-full flex flex-col animate-in fade-in duration-300">
-              <Header title={t('dashboard')} subtitle={financialContext.companyName} />
+              <Header title={t('dashboard')} subtitle={financialContext.companyName}>
+                <button
+                  onClick={() => {
+                    clearUserData();
+                    initData();
+                  }}
+                  className="text-xs bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 px-3 py-1 rounded hover:bg-rose-200 dark:hover:bg-rose-800 transition-colors"
+                  title="Clear demo data"
+                >
+                  Clear Demo Data
+                </button>
+              </Header>
               <div className="flex-1 overflow-hidden mt-4">
                 <Dashboard data={financialContext} lang={lang} isDark={theme === 'dark'} />
               </div>
@@ -318,12 +329,17 @@ const MobileNavBtn = ({ active, onClick, icon }: any) => (
   </button>
 );
 
-const Header = ({ title, subtitle }: { title: string, subtitle?: string }) => (
+const Header = ({ title, subtitle, children }: { title: string, subtitle?: string, children?: React.ReactNode }) => (
   <div className="flex justify-between items-end border-b border-slate-200 dark:border-slate-800/50 pb-4">
     <div>
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">{title}</h1>
       {subtitle && <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{subtitle}</p>}
     </div>
+    {children && (
+      <div className="flex items-center gap-2">
+        {children}
+      </div>
+    )}
   </div>
 );
 
