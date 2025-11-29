@@ -1,4 +1,4 @@
-# Fincap AI 💵
+# Fincap AI 💵 Try it now!: https://fincapai.netlify.app
 A Personal Finance Dashboard with AI-powered insights
 
 Fincap AI is a modern web application designed to help users manage their personal finances through an intuitive dashboard, transaction tracking, document uploads, and an integrated AI assistant powered by Gemini.  
